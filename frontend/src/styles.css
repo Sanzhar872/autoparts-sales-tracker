@@ -12,6 +12,9 @@
   --warn-bg: #fff6dd;
   --err: #cf222e;
   --err-bg: #fdecee;
+  --tabbar-h: 56px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236b7280' stroke-width='2'/%3E%3C/svg%3E");
   color-scheme: light;
 }
 
@@ -37,11 +40,17 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 code {
@@ -49,6 +58,7 @@ code {
   background: var(--bg);
   padding: 0 4px;
   border-radius: 4px;
+  white-space: nowrap;
 }
 
 h1 {
@@ -60,30 +70,77 @@ h3 {
   margin: 8px 0 0;
 }
 
+/* Поля и кнопки. Шрифт полей не меньше 16px — иначе iOS Safari увеличивает страницу при фокусе. */
 input,
 select,
 textarea,
 button,
 .button {
   font: inherit;
+  font-size: 16px;
   color: inherit;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--card);
-  padding: 8px 10px;
-  min-height: 40px;
+  border-radius: 10px;
+  background-color: var(--card);
+  padding: 8px 12px;
+  min-height: 44px;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 input,
 select,
 textarea {
+  display: block;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+}
+
+select {
+  padding-right: 32px;
+  background-image: var(--arrow);
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+/* iOS рисует пустое поле даты нулевой высоты и центрирует значение. */
+input[type="date"] {
+  line-height: 26px;
+  text-align: left;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+input[type="radio"] {
+  -webkit-appearance: radio;
+  appearance: auto;
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  flex: none;
+  margin: 0;
 }
 
 textarea {
   resize: vertical;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 15px;
+  font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.5;
 }
 
 button,
@@ -94,6 +151,7 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
 }
 
 button:disabled {
@@ -101,10 +159,16 @@ button:disabled {
   cursor: default;
 }
 
+button:active:not(:disabled),
+.button:active {
+  opacity: 0.75;
+}
+
 .primary {
-  background: var(--primary);
+  background-color: var(--primary);
   border-color: var(--primary);
   color: var(--primary-text);
+  font-weight: 600;
 }
 
 .danger {
@@ -116,6 +180,7 @@ button.link {
   background: none;
   color: var(--primary);
   padding: 4px 8px;
+  min-height: 36px;
 }
 
 label {
@@ -124,18 +189,19 @@ label {
   gap: 4px;
   font-size: 0.85rem;
   color: var(--muted);
+  min-width: 0;
 }
 
 label > input,
 label > select {
   color: var(--text);
-  font-size: 1rem;
 }
+
+/* Каркас */
 
 .app {
   max-width: 980px;
   margin: 0 auto;
-  padding-bottom: 40px;
 }
 
 .header {
@@ -146,8 +212,18 @@ label > select {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
   background: var(--bg);
   border-bottom: 1px solid var(--border);
+}
+
+.page-title {
+  display: none;
+  font-weight: 700;
+  font-size: 1.15rem;
+  flex: 1;
 }
 
 .nav {
@@ -172,12 +248,15 @@ label > select {
 
 .main {
   padding: 12px;
+  padding-bottom: 40px;
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
 }
 
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 12px;
 }
 
@@ -216,6 +295,7 @@ label > select {
 
 .center {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -243,25 +323,34 @@ label > select {
   font-size: 0.85rem;
 }
 
+.error,
+.success,
+.note {
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
 .error {
   color: var(--err);
   background: var(--err-bg);
-  border-radius: 8px;
-  padding: 8px 10px;
 }
 
 .success {
   color: var(--ok);
   background: var(--ok-bg);
-  border-radius: 8px;
-  padding: 8px 10px;
 }
 
 .note {
   color: var(--warn);
   background: var(--warn-bg);
-  border-radius: 8px;
-  padding: 8px 10px;
+}
+
+/* Ввод */
+
+.format-help {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
 }
 
 .hints {
@@ -271,10 +360,13 @@ label > select {
 }
 
 .hints button {
-  min-height: 34px;
-  padding: 4px 10px;
+  min-height: 36px;
+  padding: 4px 12px;
   border-radius: 999px;
-  background: var(--bg);
+  background-color: var(--bg);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .entry {
@@ -284,15 +376,15 @@ label > select {
   gap: 6px;
 }
 
-.entry.ok {
+.entry-ok {
   border-left-color: var(--ok);
 }
 
-.entry.ambiguous {
+.entry-ambiguous {
   border-left-color: var(--warn);
 }
 
-.entry.error {
+.entry-error {
   border-left-color: var(--err);
 }
 
@@ -314,15 +406,15 @@ label > select {
   font-weight: 600;
 }
 
-.status.ok {
+.status-ok {
   color: var(--ok);
 }
 
-.status.ambiguous {
+.status-ambiguous {
   color: var(--warn);
 }
 
-.status.error {
+.status-error {
   color: var(--err);
 }
 
@@ -333,20 +425,16 @@ label > select {
 .options {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .option {
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--text);
   font-size: 0.95rem;
-}
-
-.option input {
-  width: auto;
-  min-height: auto;
+  padding: 8px 0;
 }
 
 .similar ul {
@@ -354,6 +442,8 @@ label > select {
   padding-left: 20px;
   font-size: 0.9rem;
 }
+
+/* Списки */
 
 .list {
   display: flex;
@@ -391,25 +481,28 @@ label > select {
   gap: 8px;
 }
 
+/* Статистика */
+
 .segmented {
   display: flex;
 }
 
 .segmented button {
+  flex: 1;
   border-radius: 0;
 }
 
 .segmented button:first-child {
-  border-radius: 8px 0 0 8px;
+  border-radius: 10px 0 0 10px;
 }
 
 .segmented button:last-child {
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 10px 10px 0;
   border-left: none;
 }
 
 .segmented button.active {
-  background: var(--primary);
+  background-color: var(--primary);
   border-color: var(--primary);
   color: var(--primary-text);
 }
@@ -423,31 +516,48 @@ label > select {
 .tile-value {
   font-size: 1.3rem;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.chart-info {
+  color: var(--muted);
+  min-height: 1.4em;
+  margin-bottom: 4px;
 }
 
 .chart {
   display: flex;
-  align-items: flex-end;
-  gap: 4px;
+  align-items: stretch;
+  gap: 3px;
   height: 200px;
-  overflow-x: auto;
 }
 
 .bar-col {
-  flex: 1 0 28px;
+  flex: 1 1 0;
+  min-width: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
   gap: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  min-height: 0;
 }
 
 .bar {
+  display: block;
   width: 70%;
   min-height: 1px;
   background: var(--primary);
   border-radius: 4px 4px 0 0;
+}
+
+.bar-col.active .bar {
+  background: var(--ok);
 }
 
 .bar-value,
@@ -455,10 +565,12 @@ label > select {
   font-size: 0.7rem;
   color: var(--muted);
   white-space: nowrap;
+  min-height: 1.1em;
 }
 
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0;
 }
 
@@ -466,6 +578,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
 }
 
 th,
@@ -476,6 +589,10 @@ td {
   white-space: nowrap;
 }
 
+tr:last-child td {
+  border-bottom: none;
+}
+
 th {
   color: var(--muted);
   font-weight: 500;
@@ -483,4 +600,141 @@ th {
 
 .num {
   text-align: right;
+}
+
+/* Телефон */
+
+@media (max-width: 640px) {
+  .page-title {
+    display: block;
+  }
+
+  /* Нижняя панель вкладок, как в приложениях iOS. */
+  .nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    gap: 0;
+    overflow: visible;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding-bottom: var(--safe-bottom);
+  }
+
+  .nav a {
+    flex: 1 1 0;
+    min-width: 0;
+    height: var(--tabbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+    border-radius: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav a.active {
+    background: none;
+    color: var(--primary);
+    font-weight: 700;
+    box-shadow: inset 0 2px 0 var(--primary);
+  }
+
+  .main {
+    padding: 10px;
+    padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 20px);
+  }
+
+  .card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .stack {
+    gap: 10px;
+  }
+
+  /* Фильтры — ровная сетка в две колонки. */
+  .filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+  }
+
+  .filters > label.grow,
+  .filters > .segmented,
+  .filters > .button,
+  .filters > span {
+    grid-column: 1 / -1;
+  }
+
+  .item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  .item-actions {
+    grid-column: 1 / -1;
+  }
+
+  .item-actions button {
+    flex: 1;
+    min-height: 38px;
+    font-size: 15px;
+  }
+
+  .item > .row {
+    grid-column: 1 / -1;
+  }
+
+  .tiles {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tile-wide {
+    grid-column: 1 / -1;
+  }
+
+  .tile-value {
+    font-size: 1.15rem;
+  }
+
+  .chart {
+    height: 160px;
+    gap: 2px;
+  }
+
+  .bar-value {
+    display: none;
+  }
+
+  .bar {
+    width: 80%;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  th,
+  td {
+    padding: 7px 6px;
+  }
+
+  th:first-child,
+  td:first-child {
+    padding-left: 10px;
+  }
+
+  th:last-child,
+  td:last-child {
+    padding-right: 10px;
+  }
 }

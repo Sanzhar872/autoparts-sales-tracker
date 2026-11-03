@@ -37,7 +37,8 @@ export default function App() {
   if (auth === "loading") return <div className="center muted">Загрузка…</div>;
   if (auth === "out") return <LoginPage onLogin={() => setAuth("in")} />;
 
-  const Page = PAGES.find((p) => p.id === page)!.component;
+  const current = PAGES.find((p) => p.id === page)!;
+  const Page = current.component;
 
   async function logout() {
     await api("/auth/logout", { method: "POST" }).catch(() => {});
@@ -47,6 +48,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
+        <span className="page-title">{current.title}</span>
         <nav className="nav">
           {PAGES.map((p) => (
             <a key={p.id} href={`#/${p.id}`} className={p.id === page ? "active" : ""}>

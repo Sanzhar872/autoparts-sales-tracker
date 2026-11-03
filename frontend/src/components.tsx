@@ -99,15 +99,27 @@ export function ExportPanel() {
 
 export function BarChart({ data }: { data: { label: string; value: number; title: string }[] }) {
   const max = Math.max(1, ...data.map((d) => d.value));
+  // На узком экране подписи не помещаются под каждым столбцом — показываем через один.
+  const step = data.length > 8 ? 2 : 1;
+  const [active, setActive] = useState<number | null>(null);
   return (
-    <div className="chart">
-      {data.map((d) => (
-        <div key={d.label} className="bar-col" title={d.title}>
-          <div className="bar-value">{d.value ? Math.round(d.value / 1000).toLocaleString("ru-RU") + "к" : ""}</div>
-          <div className="bar" style={{ height: `${(d.value / max) * 100}%` }} />
-          <div className="bar-label">{d.label}</div>
-        </div>
-      ))}
+    <div className="chart-wrap">
+      <div className="chart-info small">{active !== null ? data[active].title : "Нажмите на столбец, чтобы увидеть сумму"}</div>
+      <div className="chart">
+        {data.map((d, i) => (
+          <button
+            type="button"
+            key={d.label}
+            className={`bar-col${active === i ? " active" : ""}`}
+            title={d.title}
+            onClick={() => setActive(active === i ? null : i)}
+          >
+            <span className="bar-value">{d.value ? Math.round(d.value / 1000).toLocaleString("ru-RU") + "к" : ""}</span>
+            <span className="bar" style={{ height: `${(d.value / max) * 100}%` }} />
+            <span className="bar-label">{(data.length - 1 - i) % step === 0 ? d.label : ""}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

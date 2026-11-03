@@ -37,12 +37,12 @@ export default function CarsPage() {
   return (
     <div className="stack">
       <form className="card row" onSubmit={add}>
-        <input className="grow" value={name} placeholder="Новая марка, одним словом" onChange={(e) => setName(e.target.value)} />
+        <input className="grow" value={name} placeholder="Новая марка" onChange={(e) => setName(e.target.value)} />
         <button className="primary" disabled={!name.trim()}>
           Добавить
         </button>
       </form>
-      <div className="muted small">Названия приводятся к нижнему регистру, латинские двойники заменяются на кириллицу.</div>
+      <div className="muted small">Одно слово. Названия приводятся к нижнему регистру, латинские двойники заменяются на кириллицу.</div>
       {error && <div className="error">{error}</div>}
       <div className="list">
         {cars.map((car) => {

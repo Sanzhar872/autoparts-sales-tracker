@@ -10,6 +10,14 @@ function periodLabel(start: string, group: "week" | "month"): string {
   return group === "month" ? `${MONTHS[Number(m) - 1]} ${y.slice(2)}` : `${d}.${m}`;
 }
 
+/** Короткая подпись периода для таблицы: «17.08–23.08.26» или «авг 26». */
+function periodRange(start: string, end: string, group: "week" | "month"): string {
+  if (group === "month") return periodLabel(start, group);
+  const [, m1, d1] = start.split("-");
+  const [y2, m2, d2] = end.split("-");
+  return `${d1}.${m1}–${d2}.${m2}.${y2.slice(2)}`;
+}
+
 export default function StatsPage() {
   const [cars] = useCars();
   const [group, setGroup] = useState<"week" | "month">("week");
@@ -68,14 +76,14 @@ export default function StatsPage() {
               <div className="muted small">Продаж</div>
               <div className="tile-value">{stats.total.count}</div>
             </div>
-            <div className="card tile">
+            <div className="card tile tile-wide">
               <div className="muted small">Возвраты</div>
               <div className="tile-value">
-                {stats.total.returns_count} · {formatMoney(stats.total.returns_sum)}
+                {formatMoney(stats.total.returns_sum)} <span className="muted small">· {stats.total.returns_count} шт</span>
               </div>
             </div>
           </div>
-          <div className="card">
+          <div className="card chart-card">
             <BarChart
               data={stats.periods.map((p) => ({
                 label: periodLabel(p.start, stats.group),
@@ -89,18 +97,16 @@ export default function StatsPage() {
               <thead>
                 <tr>
                   <th>{stats.group === "week" ? "Неделя" : "Месяц"}</th>
-                  <th className="num">Продаж</th>
+                  <th className="num">Шт</th>
                   <th className="num">Выручка</th>
-                  <th className="num">Возвратов</th>
-                  <th className="num">Сумма возвратов</th>
+                  <th className="num">Возвр.</th>
+                  <th className="num">Сумма возвр.</th>
                 </tr>
               </thead>
               <tbody>
                 {[...stats.periods].reverse().map((p) => (
                   <tr key={p.start}>
-                    <td>
-                      {formatDate(p.start)} — {formatDate(p.end)}
-                    </td>
+                    <td>{periodRange(p.start, p.end, stats.group)}</td>
                     <td className="num">{p.count}</td>
                     <td className="num">{formatMoney(p.revenue)}</td>
                     <td className="num">{p.returns_count}</td>
@@ -116,10 +122,10 @@ export default function StatsPage() {
                 <thead>
                   <tr>
                     <th>Марка</th>
-                    <th className="num">Продаж</th>
+                    <th className="num">Шт</th>
                     <th className="num">Выручка</th>
-                    <th className="num">Возвратов</th>
-                    <th className="num">Сумма возвратов</th>
+                    <th className="num">Возвр.</th>
+                    <th className="num">Сумма возвр.</th>
                   </tr>
                 </thead>
                 <tbody>

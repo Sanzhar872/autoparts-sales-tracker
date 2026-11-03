@@ -129,7 +129,8 @@ export default function EntryPage() {
         )}
         <textarea
           ref={textarea}
-          rows={8}
+          rows={7}
+          enterKeyHint="enter"
           value={text}
           placeholder={PLACEHOLDER}
           onChange={(e) => changeText(e.target.value)}
@@ -150,9 +151,16 @@ export default function EntryPage() {
             ))}
           </div>
         )}
-        <div className="muted small">
-          Формат: <code>марка запчасть - цена</code>, старый завоз: <code>с код запчасть - цена</code>, возврат:{" "}
-          <code>возврат …</code>
+        <div className="muted small format-help">
+          <span>
+            Продажа: <code>марка запчасть - цена</code>
+          </span>
+          <span>
+            Старый завоз: <code>с код запчасть - цена</code>
+          </span>
+          <span>
+            Возврат: <code>возврат …</code>
+          </span>
         </div>
         {error && <div className="error">{error}</div>}
         {message && <div className="success">{message}</div>}
@@ -164,11 +172,11 @@ export default function EntryPage() {
       {items.length > 0 && (
         <div className="stack">
           {items.map((item) => (
-            <div key={item.line} className={`card entry ${item.status}`}>
+            <div key={item.line} className={`card entry entry-${item.status}`}>
               <div className="entry-head">
                 <span className="muted">Строка {item.line}</span>
                 {item.kind && <span className="badge">{item.kind === "return" ? "Возврат" : "Продажа"}</span>}
-                <span className={`status ${item.status}`}>{STATUS_TEXT[item.status]}</span>
+                <span className={`status status-${item.status}`}>{STATUS_TEXT[item.status]}</span>
               </div>
               {item.kind ? (
                 <div className="entry-body">
