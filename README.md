@@ -101,8 +101,12 @@ cookie авторизации первичная (`SameSite=Lax`, `Secure`), COR
 блокировал бы стороннюю cookie и вход бы не работал.
 
 ### 4. Cron для Supabase
-Внешний cron (например, cron-job.org) раз в три дня вызывает `GET https://<сервис>.onrender.com/health` —
-напрямую в Render, не через Vercel. Эндпоинт выполняет `SELECT 1`, чтобы Supabase не приостанавливал проект.
+GitHub Actions (`.github/workflows/keepalive.yml`) раз в три дня в 06:00 UTC вызывает
+`GET https://autoparts-sales-tracker.onrender.com/health` — напрямую в Render, не через Vercel.
+Эндпоинт выполняет `SELECT 1`, чтобы Supabase не приостанавливал проект. Запрос повторяется до 5 раз
+с ожиданием, пока просыпается Render. Ручной запуск: вкладка Actions → Keep database alive → Run workflow.
+В публичном репозитории GitHub отключает расписание после 60 дней без коммитов — тогда включите его снова
+во вкладке Actions или сделайте репозиторий приватным.
 
 ## Принятые решения по неоднозначным местам
 

@@ -1,0 +1,28 @@
+# Раз в три дня дёргает /health: он делает SELECT 1, и Supabase не приостанавливает проект.
+name: Keep database alive
+
+on:
+  schedule:
+    - cron: "0 6 */3 * *" # 06:00 UTC (11:00 по Алматы) каждый третий день месяца
+  workflow_dispatch: # ручной запуск для проверки
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Ping /health
+        env:
+          HEALTH_URL: https://autoparts-sales-tracker.onrender.com/health
+        run: |
+          # Бесплатный Render засыпает и просыпается до минуты — отсюда долгий таймаут и повторы.
+          for attempt in 1 2 3 4 5; do
+            body=$(curl -sS --max-time 90 "$HEALTH_URL" || true)
+            echo "Попытка $attempt: $body"
+            if [ "$body" = '{"status":"ok"}' ]; then
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::$HEALTH_URL не ответил status ok"
+          exit 1
