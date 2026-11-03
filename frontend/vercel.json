@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://REPLACE-WITH-RENDER-SERVICE.onrender.com/api/:path*" }
+    { "source": "/api/:path*", "destination": "https://autoparts-sales-tracker.onrender.com/api/:path*" }
   ]
 }

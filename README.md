@@ -93,7 +93,7 @@ Transaction pooler (порт 6543) тоже возможен, но ломает 
 Интерфейс в это время показывает «Сервер просыпается…». Чтобы не засыпал, можно пинговать `/health` чаще (например, раз в 10 минут).
 
 ### 3. Vercel (frontend)
-1. В `frontend/vercel.json` замените `REPLACE-WITH-RENDER-SERVICE` на имя сервиса Render.
+1. В `frontend/vercel.json` указан адрес сервиса Render (`autoparts-sales-tracker.onrender.com`); при смене сервиса поменяйте его.
 2. New Project → репозиторий, **Root Directory: `frontend`**, Framework: Vite (Build `npm run build`, Output `dist`).
 
 Vercel проксирует `/api/*` на Render, поэтому для браузера фронт и API на одном домене:
